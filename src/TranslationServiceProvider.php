@@ -13,7 +13,6 @@ use Waavi\Translation\Middleware\TranslationMiddleware;
 use Waavi\Translation\Models\Translation;
 use Waavi\Translation\Repositories\LanguageRepository;
 use Waavi\Translation\Repositories\TranslationRepository;
-use Waavi\Translation\Routes\ResourceRegistrar;
 
 class TranslationServiceProvider extends LaravelTranslationServiceProvider
 {
@@ -47,8 +46,6 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider
         $this->registerCacheFlusher();
         $this->app->singleton('translation.uri.localizer', UriLocalizer::class);
         $this->app[\Illuminate\Routing\Router::class]->middleware('localize', TranslationMiddleware::class);
-        // Fix issue with laravel prepending the locale to localize resource routes:
-        $this->app->bind('Illuminate\Routing\ResourceRegistrar', ResourceRegistrar::class);
     }
 
     /**
