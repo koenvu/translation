@@ -32,6 +32,15 @@ class Translation extends Model
     {
         return $this->namespace === '*' ? "{$this->group}.{$this->item}" : "{$this->namespace}::{$this->group}.{$this->item}";
     }
+    
+    /**
+     *  Returns the full translation code for an entry: namespace.group.item
+     *  @return string
+     */
+    public function getKeyAttribute()
+    {
+        return $this->namespace === '*' ? "{$this->group}.{$this->item}" : "{$this->namespace}.{$this->group}.{$this->item}";
+    }
 
     /**
      *  Flag this entry as Reviewed
