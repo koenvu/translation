@@ -1,9 +1,12 @@
 <?php namespace Waavi\Translation\Models;
 
+use App\Eloquent\Audits;
 use Illuminate\Database\Eloquent\Model;
 
 class Translation extends Model
 {
+    use Audits;
+
     /**
      *  Table name in the database.
      *  @var string
