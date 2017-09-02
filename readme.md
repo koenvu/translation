@@ -36,9 +36,9 @@ WAAVI is a web development studio based in Madrid, Spain. You can learn more abo
 :---------|:----------
  4.x  	  | 1.0.x
  5.0.x    | 2.0.x
- 5.1.x    | 2.1.x
- 5.2.x    | 2.1.4 and higher
- 5.3.x    | 2.1.5 and higher
+ 5.1.x|5.3.x    | 2.1.x
+ 5.4.x    | 2.2.x
+ 5.5.x    | 2.3.x and higher
 
 ## Features overview
 
@@ -52,12 +52,13 @@ WAAVI is a web development studio based in Madrid, Spain. You can learn more abo
 
 Require through composer
 
-	composer require waavi/translation 2.1.x
+
+	composer require waavi/translation 2.3.x
 
 Or manually edit your composer.json file:
 
 	"require": {
-		"waavi/translation": "2.1.x"
+		"waavi/translation": "2.3.x"
 	}
 
 Once installed, in your project's config/app.php file replace the following entry from the providers array:
@@ -74,7 +75,7 @@ Remove your config cache:
 
 Publish both the configuration file and the migrations:
 
-	php artisan vendor:publish
+	php artisan vendor:publish --provider="Waavi\Translation\TranslationServiceProvider"
 
 Execute the database migrations:
 
@@ -293,7 +294,7 @@ The provided methods are:
  Method   | Description
 :---------|:--------
 update($id, $text);									| Update an unlocked entry
-updateAndLock($id, $text);							| Update and lock an entry (locked or not) 
+updateAndLock($id, $text);							| Update and lock an entry (locked or not)
 allByLocale($locale, $perPage = 0);					| Get all by locale
 untranslated($locale, $perPage = 0, $text = null);	| Get all untranslated entries. If $text is set, entries will be filtered by partial matches to translation value.
 pendingReview($locale, $perPage = 0);				| List all entries pending review
@@ -385,6 +386,19 @@ Every localized route must be prefixed with the current locale:
 	Route::group(['prefix' => \UriLocalizer::localeFromRequest(), 'middleware' => 'localize')], function () {
 	    /* Your routes here */
 	});
+```
+
+Starting on v2.1.6, you may also specify a custom position for the locale segment in your url. For example, if the locale info is the third segment in a URL (/api/v1/es/my_resource), you may use:
+
+```php
+    // For selectively chosen routes:
+    Route::group(['prefix' => 'api/v1'], function() {
+        /** ... Non localized urls here **/
+
+        Route::group(['prefix' => \UriLocalizer::localeFromRequest(2), 'middleware' => 'localize:2')], function () {
+            /* Your localized routes here */
+        });
+    });
 ```
 
 In your views, for routes where the Middleware is active, you may present the user with a menu to switch from the current language to another by using the shared variables. For example:

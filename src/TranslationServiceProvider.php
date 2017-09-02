@@ -1,4 +1,5 @@
-<?php namespace Waavi\Translation;
+<?php
+namespace Waavi\Translation;
 
 use Illuminate\Translation\FileLoader as LaravelFileLoader;
 use Illuminate\Translation\TranslationServiceProvider as LaravelTranslationServiceProvider;
@@ -13,6 +14,7 @@ use Waavi\Translation\Middleware\TranslationMiddleware;
 use Waavi\Translation\Models\Translation;
 use Waavi\Translation\Repositories\LanguageRepository;
 use Waavi\Translation\Repositories\TranslationRepository;
+use Waavi\Translation\Routes\ResourceRegistrar;
 
 class TranslationServiceProvider extends LaravelTranslationServiceProvider
 {
@@ -26,9 +28,7 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider
         $this->publishes([
             __DIR__ . '/../config/translator.php' => config_path('translator.php'),
         ]);
-        $this->publishes([
-            __DIR__ . '/../database/migrations/' => database_path('migrations'),
-        ], 'migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations/');
     }
 
     /**
@@ -45,7 +45,9 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider
         $this->registerFileLoader();
         $this->registerCacheFlusher();
         $this->app->singleton('translation.uri.localizer', UriLocalizer::class);
-        $this->app[\Illuminate\Routing\Router::class]->middleware('localize', TranslationMiddleware::class);
+        $this->app[\Illuminate\Routing\Router::class]->aliasMiddleware('localize', TranslationMiddleware::class);
+        // Fix issue with laravel prepending the locale to localize resource routes:
+        $this->app->bind('Illuminate\Routing\ResourceRegistrar', ResourceRegistrar::class);
     }
 
     /**
@@ -67,9 +69,14 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider
     {
         $app = $this->app;
         $this->app->singleton('translation.loader', function ($app) {
-            $source        = $app['config']->get('translator.source');
             $defaultLocale = $app['config']->get('app.locale');
             $loader        = null;
+            $source        = $app['config']->get('translator.source');
+            // Default source to 'files' if translations table do not exist:
+            if ($source !== 'files' && app()->environment() !== 'testing') {
+                $source = \Schema::hasTable('translator_languages') && \Schema::hasTable('translator_translations') ? $source : 'files';
+            }
+
             switch ($source) {
                 case 'mixed':
                     $laravelFileLoader = new LaravelFileLoader($app['files'], $app->basePath() . '/resources/lang');
@@ -92,8 +99,6 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider
                     break;
             }
             if ($app['config']->get('translator.cache.enabled')) {
-                //$cacheStore      = $app['cache']->getStore();
-                //$cacheRepository = CacheRepositoryFactory::make($cacheStore, $app['config']->get('translator.cache.suffix'));
                 $loader = new CacheLoader($defaultLocale, $app['translation.cache.repository'], $loader, $app['config']->get('translator.cache.timeout'));
             }
             return $loader;

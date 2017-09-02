@@ -2,11 +2,11 @@
 
 namespace Waavi\Test\Routes;
 
-use \Mockery;
 use Illuminate\Routing\Router;
-use Waavi\Translation\Test\TestCase;
-use Illuminate\Routing\ResourceRegistrar;
 use Waavi\Translation\Repositories\LanguageRepository;
+use Waavi\Translation\Routes\ResourceRegistrar;
+use Waavi\Translation\Test\TestCase;
+use \Mockery;
 
 class ResourceRouteTest extends TestCase
 {

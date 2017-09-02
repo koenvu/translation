@@ -3,9 +3,9 @@
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Waavi\Translation\Loaders\Loader;
-use Illuminate\Translation\LoaderInterface;
 use Waavi\Translation\Repositories\LanguageRepository;
 use Waavi\Translation\Repositories\TranslationRepository;
+use Illuminate\Contracts\Translation\Loader as LoaderContract;
 
 class FileLoaderCommand extends Command
 {
@@ -30,7 +30,7 @@ class FileLoaderCommand extends Command
      *  @param  \Waavi\Lang\Providers\LanguageEntryProvider   $translationRepository
      *  @param  \Illuminate\Foundation\Application            $app
      */
-    public function __construct(LanguageRepository $languageRepository, TranslationRepository $translationRepository, Filesystem $files, LoaderInterface $loader, $translationsPath, $defaultLocale)
+    public function __construct(LanguageRepository $languageRepository, TranslationRepository $translationRepository, Filesystem $files, LoaderContract $loader, $translationsPath, $defaultLocale)
     {
         parent::__construct();
         $this->languageRepository    = $languageRepository;
