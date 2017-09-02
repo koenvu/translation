@@ -2,7 +2,7 @@
 
 use Illuminate\Translation\FileLoader as LaravelFileLoader;
 
-class FileLoader extends Loader implements LoaderInterface
+class FileLoader extends Loader
 {
     /**
      * The default locale.
