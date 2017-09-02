@@ -28,7 +28,9 @@ class TranslationServiceProvider extends LaravelTranslationServiceProvider
         $this->publishes([
             __DIR__ . '/../config/translator.php' => config_path('translator.php'),
         ]);
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations/');
+        $this->publishes([
+            __DIR__ . '/../database/migrations/' => database_path('migrations'),
+        ], 'migrations');
     }
 
     /**
